@@ -1,11 +1,13 @@
+import json
 import os
 import subprocess
-import logging
-import json
 from urllib.parse import urlparse
 
 import yaml
 
+from utils import logger
+
+LOGGER = logger.get_logger("bilibilib_get_audio", "../log/thi_proj.log")
 
 def extract_base_url(url: str):
     parsed_url = urlparse(url)
@@ -29,7 +31,7 @@ def rename(directory: str, ori_suffix: str, new_suffix: str):
                 new_filename = name + new_suffix
                 new_file_path = os.path.join(directory, new_filename)
                 os.rename(old_file_path, new_file_path)
-                print(f"file {filename} has been renamed to {new_filename}")
+                LOGGER.info(f"file {filename} has been renamed to {new_filename}")
 
 
 def convert_m4s_2_mp3(input_file: str, output_file: str, bitrate: str = "320k"):
@@ -47,12 +49,12 @@ def convert_m4s_2_mp3(input_file: str, output_file: str, bitrate: str = "320k"):
     if output_file is None:
         output_file = os.path.splitext(input_file)[0] + ".mp3"
     if not input_file.endswith(".m4s"):
-        logging.warning(f"Failure convert {input_file} to {output_file}, bit rate: {bitrate}")
+        LOGGER.warning(f"Failure convert {input_file} to {output_file}, bit rate: {bitrate}")
     try:
         subprocess.run(command, check=True)
-        logging.info(f"Successfully convert {input_file} to {output_file}, bit rate: {bitrate}")
+        LOGGER.info(f"Successfully convert {input_file} to {output_file}, bit rate: {bitrate}")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Failure convert {input_file} to {output_file}, bit rate: {bitrate}, error: {e}")
+        LOGGER.error(f"Failure convert {input_file} to {output_file}, bit rate: {bitrate}, error: {e}")
 
 
 def get_audio_bitrate(file_path):
@@ -72,7 +74,7 @@ def get_audio_bitrate(file_path):
         bitrate = info["streams"][0]["bit_rate"]
         return int(bitrate)
     except (subprocess.CalledProcessError, KeyError, IndexError) as e:
-        logging.error(f"Fail to get bitrate: {e}")
+        LOGGER.error(f"Fail to get bitrate: {e}")
         return None
 
 

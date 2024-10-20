@@ -1,6 +1,0 @@
-2024-10-20 08:44:33,879 - logging_app.py[line:27] - DEBUG: This is a debug message.
-2024-10-20 08:44:33,879 - logging_app.py[line:28] - INFO: This is an info message.
-2024-10-20 08:44:33,879 - logging_app.py[line:29] - WARNING: This is a warning message.
-2024-10-20 08:44:33,879 - logging_app.py[line:30] - ERROR: This is an error message.
-2024-10-20 08:44:33,879 - logging_app.py[line:31] - CRITICAL: This is a critical message.
-2024-10-20 08:44:33,880 - logging_app.py[line:37] - ERROR: division by zero
