@@ -3,9 +3,10 @@ from requests.adapters import HTTPAdapter
 from tqdm import tqdm
 from urllib3 import Retry
 
-from utils import logger
+from thi_proj.resource import resource_path
+from thi_proj.utils import logger
 
-LOGGER = logger.get_logger("bilibilib_get_audio", "../log/thi_proj.log")
+LOGGER = logger.get_logger("bilibilib_get_audio", resource_path("../log/thi_proj.log"))
 
 
 def download_resource(param_url: str, output_path: str, headers: dict):

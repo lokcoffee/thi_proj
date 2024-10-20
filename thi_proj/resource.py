@@ -1,13 +1,23 @@
 import json
 import os
+import sys
 import subprocess
-from urllib.parse import urlparse
-
 import yaml
+from urllib.parse import urlparse
+from thi_proj.utils import logger
 
-from utils import logger
 
-LOGGER = logger.get_logger("bilibilib_get_audio", "../log/thi_proj.log")
+def resource_path(relative_path):
+    """获取资源文件的绝对路径，处理 PyInstaller 打包后的情况"""
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
+LOGGER = logger.get_logger("bilibilib_get_audio", resource_path("../log/thi_proj.log"))
+
 
 def extract_base_url(url: str):
     parsed_url = urlparse(url)
@@ -82,3 +92,10 @@ def load_yaml(file_path: str):
     with open(file_path, "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
     return config
+
+
+def ensure_download_directory():
+    download_path = resource_path("../download")
+    if not os.path.exists(download_path):
+        os.makedirs(download_path)
+    return download_path

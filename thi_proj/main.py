@@ -1,27 +1,27 @@
 import json
-
 import requests
 from bs4 import BeautifulSoup, ResultSet
 from lxml import etree
 
-import utils.logger
-from utils.downloads import download_resource
-from resource import load_yaml, extract_base_url
+from thi_proj.utils.logger import get_logger
+from thi_proj.utils.downloads import download_resource
+from thi_proj.resource import load_yaml, extract_base_url, ensure_download_directory, resource_path
 
-LOGGER = utils.logger.get_logger("bilibilib_get_audio", "../log/thi_proj.log")
 
-config = load_yaml("../resources/download_items.yml")
+LOGGER = get_logger("bilibilib_get_audio", resource_path("../log/thi_proj.log"))
+
+config = load_yaml(resource_path("../resources/download_items.yml"))
 download_item = config["download_items"][0]["download_item"]
 
 referer = extract_base_url(download_item["get_title_list_url"])
 LOGGER.info(f"referer: {referer}")
 # fake request head
 HEADERS = {
-        "User-Agent": str(download_item["user_agent"]),
-        # 防盗链子
-        "Referer": referer,
-        "Cookie": str(download_item["cookie"])
-    }
+    "User-Agent": str(download_item["user_agent"]),
+    # 防盗链子
+    "Referer": referer,
+    "Cookie": str(download_item["cookie"])
+}
 
 
 def extract_play_list(url: str):
@@ -50,16 +50,17 @@ def extract_resource_download_url(url: str, title: str):
     video_url = info_dict["data"]["dash"]["video"][0]["baseUrl"]
     audio_url = info_dict["data"]["dash"]["audio"][0]["baseUrl"]
 
-    video_path = "../download/{title}_video.mp4"
-    audio_path = "../download/{title}_audio.m4s"
+    ensure_download_directory()
+    video_path = resource_path("../download/{title}_video.mp4")
+    audio_path = resource_path("../download/{title}_audio.m4s")
 
     res_obj = {"video_url": video_url, "audio_url": audio_url, "video_path": video_path.replace("{title}", title),
-            "audio_path": audio_path.replace("{title}", title)}
+               "audio_path": audio_path.replace("{title}", title)}
     LOGGER.info(f"extract_resource_download_url {res_obj}")
     return res_obj
 
 
-if __name__ == "__main__":
+def main():
     """
     raw -> https://www.bilibili.com/video/BV1vE411d7ht/?spm_id_from=333.788.recommend_more_video.0&vd_source=f230a650621ce31e8709b0bd5a3826fb
     changed to -> https://www.bilibili.com/video/BV1vE411d7ht?spm_id_from=333.788.videopod.episodes&vd_source=f230a650621ce31e8709b0bd5a3826fb
@@ -75,3 +76,7 @@ if __name__ == "__main__":
         print(f"{index}: {value}")
         resource_url = extract_resource_download_url(f"{download_url}{index}", value)
         download_resource(resource_url["audio_url"], resource_url["audio_path"], HEADERS)
+
+
+if __name__ == "__main__":
+    main()
